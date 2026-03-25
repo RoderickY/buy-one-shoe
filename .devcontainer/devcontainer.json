@@ -2,7 +2,7 @@
   "name": "Buy One Shoe",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
   "postCreateCommand": "npm install && cd client && npm install && npm run build && cd ..",
-  "postStartCommand": "node --experimental-sqlite server.js",
+  "postStartCommand": "NODE_ENV=production node --experimental-sqlite server.js",
   "forwardPorts": [3001],
   "portsAttributes": {
     "3001": {

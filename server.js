@@ -184,9 +184,12 @@ app.post('/api/reviews', (req, res) => {
 });
 
 // ── SERVE BUILT FRONTEND ──────────────────────────────────────────────────────
-if (process.env.NODE_ENV==='production') {
-  app.use(express.static(path.join(__dirname,'client/dist')));
-  app.get('*', (req,res) => res.sendFile(path.join(__dirname,'client/dist/index.html')));
+// Serve static files whenever the dist folder exists (production OR Codespaces)
+const distPath = path.join(__dirname, 'client/dist');
+const fs = require('fs');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res) => res.sendFile(path.join(distPath, 'index.html')));
 }
 
 app.listen(PORT, () => {
