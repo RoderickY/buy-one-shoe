@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Restart Server",
+      "type": "shell",
+      "command": "pkill -f 'node.*server.js' 2>/dev/null || true; sleep 1; NODE_ENV=production node --experimental-sqlite server.js",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
