@@ -2,8 +2,10 @@
   "name": "Buy One Shoe",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
   "postCreateCommand": "npm install && cd client && npm install && npm run build && cd ..",
-  "postStartCommand": "NODE_ENV=production node --experimental-sqlite server.js",
-  "forwardPorts": [3001],
+  "postStartCommand": "git pull origin main && NODE_ENV=production node --experimental-sqlite server.js",
+  "forwardPorts": [
+    3001
+  ],
   "portsAttributes": {
     "3001": {
       "label": "Buy One Shoe App",
@@ -12,7 +14,10 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint"
+      ]
     }
   }
 }
