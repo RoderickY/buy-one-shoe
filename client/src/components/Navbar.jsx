@@ -9,7 +9,7 @@ export default function Navbar() {
 
   return (
     <nav style={styles.nav}>
-      <div style={styles.inner}>
+      <div className="nav-inner" style={styles.inner}>
         {/* Logo */}
         <div style={styles.logo} onClick={() => navigate('/')}>
           <span style={{ fontSize: 24 }}>👟</span>
@@ -20,7 +20,7 @@ export default function Navbar() {
         </div>
 
         {/* Nav Links */}
-        <div style={styles.links}>
+        <div className="nav-links" style={styles.links}>
           <NavLink to="/" end style={({ isActive }) => ({
             ...styles.link, ...(isActive ? styles.linkActive : {})
           })}>Browse</NavLink>
@@ -36,7 +36,7 @@ export default function Navbar() {
         </div>
 
         {/* User Switcher */}
-        <div style={{ position: 'relative' }}>
+        <div className="nav-user" style={{ position: 'relative' }}>
           <button
             style={styles.userBtn}
             onClick={() => setShowUserMenu(v => !v)}
@@ -99,11 +99,12 @@ const styles = {
   inner: {
     maxWidth: 1100,
     margin: '0 auto',
-    padding: '0 20px',
-    height: 64,
+    padding: '8px 20px',
+    minHeight: 64,
     display: 'flex',
     alignItems: 'center',
-    gap: 32,
+    gap: 18,
+    flexWrap: 'wrap',
   },
   logo: {
     display: 'flex', alignItems: 'center', gap: 10,
@@ -113,6 +114,8 @@ const styles = {
   logoSub:  { fontSize: 10, color: '#9CA3AF', fontWeight: 400 },
   links: {
     display: 'flex', gap: 4, flex: 1,
+    minWidth: 220,
+    overflowX: 'auto',
   },
   link: {
     padding: '6px 14px',

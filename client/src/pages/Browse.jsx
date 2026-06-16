@@ -177,7 +177,7 @@ export default function Browse() {
 
 function Stat({ n, label }) {
   return (
-    <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.12)', borderRadius: 12, padding: '14px 24px' }}>
+    <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.12)', borderRadius: 12, padding: '14px 20px', flex: '1 1 120px' }}>
       <div style={{ fontSize: 28, fontWeight: 800, color: '#fff' }}>{n}</div>
       <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>{label}</div>
     </div>
@@ -198,8 +198,9 @@ const heroStyle = {
 const statsStyle = {
   display: 'flex',
   gap: 12,
-  flexShrink: 0,
   flexWrap: 'wrap',
+  flex: '1 1 300px',
+  minWidth: 0,
 }
 
 const filterBarStyle = {

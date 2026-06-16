@@ -18,6 +18,10 @@ npm start
 # → App available at http://localhost:3001
 ```
 
+By default, local development uses `buyoneshoe.db` with Node's built-in SQLite.
+For hosted deployment, set `DATABASE_URL` to a Supabase/Postgres connection
+string and the same app automatically switches to Postgres.
+
 ## Development Mode (hot reload)
 
 ```bash
@@ -55,17 +59,35 @@ The app ships with 5 demo users and sample listings. Switch between them using t
 
 ## Tech Stack
 
-- **Backend:** Node.js 22 + Express + SQLite (built-in `node:sqlite`)
+- **Backend:** Node.js 22 + Express
 - **Frontend:** React 18 + React Router v6 + Vite
-- **Database:** SQLite (no external dependencies — uses Node v22 built-in)
+- **Database:** SQLite locally (built-in `node:sqlite`), Supabase/Postgres in production
 - **Styling:** Custom CSS design system
+
+## Deploying with Supabase + Vercel
+
+1. Create a Supabase project.
+2. Copy the Postgres connection string. For Vercel/serverless, use the
+   Supabase transaction pooler URL when available.
+3. In Vercel, import `RoderickY/buy-one-shoe`.
+4. Add this environment variable:
+   ```
+   DATABASE_URL=postgresql://...
+   ```
+5. Deploy. Vercel runs `npm run vercel-build`, serves `client/dist`, and routes
+   `/api/*` to the Express app in `api/index.js`.
+
+The database schema and demo seed data are created automatically on first boot.
 
 ## Project Structure
 
 ```
 buy-one-shoe/
-├── server.js          # Express API server
-├── database.js        # SQLite schema + seed data
+├── app.js             # Express app shared by local server + Vercel
+├── api/index.js       # Vercel serverless entrypoint
+├── server.js          # Local HTTP server
+├── database.js        # SQLite/Postgres adapter + seed data
+├── vercel.json        # Vercel build + routing config
 ├── package.json       # Server dependencies
 └── client/
     ├── src/

@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { useApp } from '../App'
 
@@ -24,9 +24,12 @@ function getSizes(cat) {
 export default function PostListing() {
   const { currentUserId, currentUser } = useApp()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const matchListingId = searchParams.get('match')
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
+  const [matchTarget, setMatchTarget] = useState(null)
   const [form, setForm] = useState({
     category: '', brand: '', model: '', size: '', side: '',
     color: '', condition: 'good', price: '', location: '', description: '',
@@ -34,6 +37,51 @@ export default function PostListing() {
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
   const sizes = getSizes(form.category)
+  const singleSize = sizes.length === 1 ? sizes[0] : ''
+
+  useEffect(() => {
+    if (singleSize && form.size !== singleSize) {
+      set('size', singleSize)
+    }
+  }, [singleSize, form.size])
+
+  useEffect(() => {
+    if (!matchListingId || !currentUser) return
+    let cancelled = false
+
+    api.getListing(matchListingId)
+      .then(listing => {
+        if (cancelled) return
+        const oppositeSide = listing.side === 'left'
+          ? 'right'
+          : listing.side === 'right'
+            ? 'left'
+            : ''
+
+        setMatchTarget(listing)
+        setStep(2)
+        setForm(f => ({
+          ...f,
+          category: listing.category || '',
+          brand: listing.brand || '',
+          model: listing.model || '',
+          size: listing.size || '',
+          side: oppositeSide,
+          color: listing.color || '',
+          price: listing.price ? String(listing.price) : '',
+          location: currentUser.location || '',
+          description: `I can complete this co-buy with ${listing.user_name}'s ${listing.brand || ''} ${listing.model || ''}.`.trim(),
+        }))
+      })
+      .catch(() => setMatchTarget(null))
+
+    return () => { cancelled = true }
+  }, [matchListingId, currentUser])
+
+  const matchTargetTitle = useMemo(() => {
+    if (!matchTarget) return ''
+    return `${matchTarget.brand || ''} ${matchTarget.model || ''}`.trim() || 'this listing'
+  }, [matchTarget])
 
   async function submit() {
     setLoading(true)
@@ -59,6 +107,17 @@ export default function PostListing() {
         <h1 style={{ fontSize: 28, fontWeight: 800, color: '#111827', marginBottom: 6 }}>Post a Listing</h1>
         <p style={{ color: '#6B7280', fontSize: 15 }}>Tell us what you have, and what you need. We'll find your match.</p>
       </div>
+
+      {matchTarget && (
+        <div style={matchBannerStyle}>
+          <div style={{ fontWeight: 700, color: '#0F4A63', marginBottom: 4 }}>
+            Complete a co-buy for {matchTargetTitle}
+          </div>
+          <div style={{ fontSize: 13, color: '#4B5563' }}>
+            We prefilled the matching details. Post your {form.side || 'opposite-side'} item, then connect from the success screen.
+          </div>
+        </div>
+      )}
 
       {/* Progress */}
       {step < 4 && (
@@ -144,8 +203,8 @@ export default function PostListing() {
               </div>
               <div className="form-group">
                 <label className="form-label">Size *</label>
-                {sizes.length === 1 ? (
-                  <input className="form-input" value="One Size" readOnly style={{ background: '#F9FAFB', cursor: 'not-allowed' }} onChange={() => set('size', 'one-size')} />
+                {singleSize ? (
+                  <input className="form-input" value={singleSize === 'one-size' ? 'One Size' : singleSize} readOnly style={{ background: '#F9FAFB', cursor: 'not-allowed' }} />
                 ) : (
                   <select className="form-input" value={form.size} onChange={e => set('size', e.target.value)}>
                     <option value="">Select size</option>
@@ -153,7 +212,6 @@ export default function PostListing() {
                   </select>
                 )}
               </div>
-              {sizes.length === 1 && form.category === 'earrings' && !form.size && set('size', 'one-size')}
               <div className="form-group">
                 <label className="form-label">Color</label>
                 <input className="form-input" placeholder="e.g. Black, White/Blue" value={form.color} onChange={e => set('color', e.target.value)} />
@@ -285,6 +343,14 @@ const stepSub = { fontSize: 14, color: '#6B7280', marginBottom: 20 }
 const progressStyle = {
   display: 'flex', alignItems: 'center', gap: 4,
   marginBottom: 20, padding: '0 4px',
+}
+
+const matchBannerStyle = {
+  marginBottom: 20,
+  padding: '14px 18px',
+  background: '#EFF6FF',
+  border: '1px solid #BFDBFE',
+  borderRadius: 12,
 }
 const stepDot = {
   width: 28, height: 28, borderRadius: '50%',

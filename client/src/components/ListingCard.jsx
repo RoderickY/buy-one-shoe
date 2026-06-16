@@ -26,9 +26,17 @@ export default function ListingCard({ listing, onMatchCreated }) {
     if (!currentUser || isOwn) return
     setRequesting(true)
     try {
+      const suggestions = await api.getSuggestions(listing.id)
+      const myComplement = suggestions.find(item => item.user_id === currentUserId)
+
+      if (!myComplement) {
+        navigate(`/post?match=${listing.id}`)
+        return
+      }
+
       const match = await api.createMatch({
         listing_id_1: listing.id,
-        listing_id_2: listing.id, // placeholder until they post their own listing
+        listing_id_2: myComplement.id,
         user_id_1: listing.user_id,
         user_id_2: currentUserId,
       })
